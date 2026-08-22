@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 try:
     import rfc8785
 except ImportError:
-    rfc8785 = None
+    rfc8785 = None  # type: ignore[assignment]
 
 NODE_KINDS = frozenset(
     {

@@ -24,7 +24,7 @@ from typing import Any
 try:
     import rfc8785
 except ImportError:
-    rfc8785 = None
+    rfc8785 = None  # type: ignore[assignment]
 
 SIZE_METRIC = "rfc8785_bytes"
 

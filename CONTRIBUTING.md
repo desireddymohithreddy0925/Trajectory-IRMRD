@@ -202,7 +202,7 @@ Useful commands:
 ```bash
 ruff check pkg drivers client test conformance examples
 ruff format pkg drivers client test conformance examples
-mypy pkg/trajectory_ir
+mypy
 pytest test/unit/test_hash_vectors.py -q
 pytest test/unit -q
 pytest test/e2e -q
@@ -213,6 +213,8 @@ pytest conformance/ -q
 
 Use the issue forms when you can: bug report, feature, or spec question.
 
+Community issues (opened by non-maintainers) are automatically labeled with `needs triage` for review.
+
 Security issues go through private vulnerability reporting (`SECURITY.md`),
 not public issues.
 
@@ -221,3 +223,4 @@ not public issues.
 Enable branch protection on `main` as described in
 `docs/maintainer-branch-protection.md` so DCO, Quality, and Go checks are
 required before merge.
+

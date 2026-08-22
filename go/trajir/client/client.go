@@ -210,6 +210,7 @@ func (t *Trajectory) ExecTool(stepN, seq int, tool resume.Tool, args map[string]
 	if err := sandbox.AssertToolAllowed(t.Mode, tool.Name, tool.Effect); err != nil {
 		return nil, err
 	}
+	step := stepN
 	if effects.RequiresBlockAndGate(tool.Effect) {
 		fn := resume.MakeGatedToolCall(
 			t.log,
@@ -226,17 +227,28 @@ func (t *Trajectory) ExecTool(stepN, seq int, tool resume.Tool, args map[string]
 		}
 		return &ToolResult{StepN: stepN, Result: result}, nil
 	}
-	fn := resume.MakePlainToolCall(
-		t.log,
+	result, err := tool.Fn(args)
+	if err != nil {
+		return nil, err
+	}
+	if _, err := t.log.Append(
+		"TOOL_CALL",
+		&step,
+		map[string]any{"tool": tool.Name, "args": args},
 		t.TrajectoryID,
 		t.TenantID,
-		stepN,
 		seq,
-		tool.Name,
-		tool.Fn,
-	)
-	result, err := fn(args)
-	if err != nil {
+	); err != nil {
+		return nil, err
+	}
+	if _, err := t.log.Append(
+		"TOOL_RESULT",
+		&step,
+		map[string]any{"result": result},
+		t.TrajectoryID,
+		t.TenantID,
+		seq+1,
+	); err != nil {
 		return nil, err
 	}
 	return &ToolResult{StepN: stepN, Result: result}, nil

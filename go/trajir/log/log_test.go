@@ -249,7 +249,6 @@ func TestAppendSlotConflictPreservesOriginal(t *testing.T) {
 	}
 }
 
-
 func TestHasTenantFilter(t *testing.T) {
 	nl := openTemp(t)
 	step := 1
@@ -338,6 +337,5 @@ func TestHasRejectsEmptyTenant(t *testing.T) {
 		t.Fatal("expected error on empty tenantID")
 	}
 }
-
 
 

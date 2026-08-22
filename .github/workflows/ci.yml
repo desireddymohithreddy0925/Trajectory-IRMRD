@@ -207,9 +207,7 @@ jobs:
       - name: Install package for fixture generation
         run: |
           python -m pip install --upgrade pip
-          # Bypass Scorecard's unpinned-dependency regex for editable installs
-          PIPCMD="pip"
-          $PIPCMD install -e ".[rfc8785]"
+          pip install -e ".[dev]"
 
       - name: Generate cross language .tir fixture (Python export_tir)
         run: python scripts/gen_tir_fixture.py

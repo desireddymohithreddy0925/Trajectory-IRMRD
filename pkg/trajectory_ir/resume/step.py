@@ -2,7 +2,7 @@ from collections.abc import Callable
 from typing import Any
 
 from trajectory_ir.effects import requires_block_and_gate
-from trajectory_ir.resume.gate import make_gated_tool_call, make_plain_tool_call
+from trajectory_ir.resume.gate import make_gated_tool_call
 from trajectory_ir.runtime.sandbox import RunMode, assert_tool_allowed_in_mode, normalize_run_mode
 
 
@@ -139,16 +139,25 @@ def make_run_step(
                 )
                 result = durable_tool(gated)(**call["args"])
             else:
-                plain = make_plain_tool_call(
-                    node_log,
+                # R03: PURE (and other non-gated classes) are not claim-gated.
+                result = durable_tool(tool.fn)(**call["args"])
+                # Plain tools still need IR history audit; gate path already logs.
+                node_log.append(
+                    "TOOL_CALL",
+                    step_n,
+                    {"tool": call["name"], "args": call["args"]},
                     trajectory_id,
                     tenant_id,
-                    step_n,
-                    seq,
-                    call["name"],
-                    tool.fn,
+                    seq=seq,
                 )
-                result = durable_tool(plain)(**call["args"])
+                node_log.append(
+                    "TOOL_RESULT",
+                    step_n,
+                    {"result": result},
+                    trajectory_id,
+                    tenant_id,
+                    seq=seq + 1,
+                )
             results.append(result)
 
         node_log.append(

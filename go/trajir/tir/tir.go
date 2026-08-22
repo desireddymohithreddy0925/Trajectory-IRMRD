@@ -711,9 +711,21 @@ func loadImpl(path string, verify bool) (*Package, error) {
 	// Signature check after hash/seal integrity (README §9.1 order).
 	// Use the already-open archive only — never re-open path (TOCTOU / CWE-367).
 	// Present-but-invalid SIGNATURE fails even for LoadUnverified (tamper).
-	sigInfo, err := verifySignatureFromZipFiles(zr.File, VerifyOptions{})
-	if err != nil {
-		return nil, err
+	var hasSignature bool
+	for _, f := range zr.File {
+		if f.Name == SignatureMemberName {
+			hasSignature = true
+			break
+		}
+	}
+	
+	var sigInfo *SignatureInfo
+	if hasSignature {
+		var err error
+		sigInfo, err = verifySignatureFromZipFiles(zr.File, VerifyOptions{})
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &Package{

@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import Any
 
-from drivers.durable_backend.dbos.adapter import init_backend
 from trajectory_ir.effects import requires_block_and_gate
 from trajectory_ir.resume.gate import make_gated_tool_call, make_plain_tool_call
 from trajectory_ir.runtime.log import NodeLog
@@ -56,6 +55,7 @@ def open_trajectory(
     mode: RunMode | str = RunMode.LIVE,
 ) -> Trajectory:
     """Open a trajectory. ``mode=\"sandbox\"`` rejects NON_IDEMPOTENT_WRITE tools (R06)."""
+    from drivers.durable_backend.dbos.adapter import init_backend
     init_backend(app_name=trajectory_id)
     return Trajectory(
         trajectory_id=trajectory_id,
@@ -181,6 +181,7 @@ def resume(
     caller bug (wrong db_path or trajectory_id), and should fail loudly
     rather than silently behave like ``open_trajectory``.
     """
+    from drivers.durable_backend.dbos.adapter import init_backend
     init_backend(app_name=trajectory_id)
     if not NodeLog(db_path).list_nodes_all_tenants(trajectory_id):
         raise ValueError(
